@@ -1,0 +1,264 @@
+{% macro get_bmi_class(bmi) %}
+{% if not bmi %}
+bmi-default
+{% elif bmi < 18.5 %}bmi-underweight{% elif bmi <=24.9 %}bmi-normal{% elif bmi <=29.9 %}bmi-overweight{% elif bmi <=39.9
+    %}bmi-obese{% else %}bmi-extreme{% endif %} {% endmacro %} <!DOCTYPE html>
+    <html lang="zxx">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="Gym Template">
+        <meta name="keywords" content="Gym, unica, creative, html">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>{% block title %}Gym | Template{% endblock %}</title>
+
+        <!-- Google Font -->
+        <link href="https://fonts.googleapis.com/css?family=Muli:300,400,500,600,700,800,900&display=swap"
+            rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Oswald:300,400,500,600,700&display=swap" rel="stylesheet">
+
+        <!-- Css Styles -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" type="text/css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}" type="text/css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/flaticon.css') }}" type="text/css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}" type="text/css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/barfiller.css') }}" type="text/css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/magnific-popup.css') }}" type="text/css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/slicknav.min.css') }}" type="text/css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
+        <style>
+            .mobile-bmi {
+                color: #f36100;
+                /* fall back */
+            }
+
+            .bmi-default {
+                color: #f36100;
+            }
+
+            .bmi-underweight {
+                color: #87CEFA;
+            }
+
+            .bmi-normal {
+                color: #28a745;
+            }
+
+            .bmi-overweight {
+                color: #ffc107;
+            }
+
+            .bmi-obese {
+                color: #fd7e14;
+            }
+
+            .bmi-extreme {
+                color: #dc3545;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- Page Preloder -->
+        <div id="preloder">
+            <div class="loader"></div>
+        </div>
+
+        <!-- Offcanvas Menu Section Begin -->
+        <div class="offcanvas-menu-overlay"></div>
+        <div class="offcanvas-menu-wrapper">
+            <div class="canvas-close">
+                <i class="fa fa-close"></i>
+            </div>
+            <div class="canvas-search search-switch">
+                <i class="fa fa-search"></i>
+            </div>
+            <nav class="canvas-menu mobile-menu">
+                <ul>
+                    {% if session.user %}
+                    <li><span class="welcome-text">{{ session.user.split('@')[0] }}</span></li>
+                    <li><a href="{{ url_for('bmi_calculator') }}" class="{{ get_bmi_class(session.user_bmi) }}">BMI: {{
+                            session.user_bmi if
+                            session.user_bmi else '-'
+                            }}</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    {% else %}
+                    <li><a href="#" data-bs-toggle="modal" data-bs-target="#loginSignupModal">Login / Signup</a></li>
+                    {% endif %}
+                    <!-- <li><a href="{{ url_for('bmi_calculator') }}">BMI</a></li> -->
+                    <li><a href="{{ url_for('workout_history') }}">GymAi</a></li>
+                    <li><a href="{{ url_for('workout_history') }}">History</a></li>
+                    <li><a href="{{ url_for('exercises') }}">Exercises</a></li>
+                    <li class="dropdown"><a href="#">Workout</a>
+                        <ul class="dropdown">
+                            <li><a href="{{ url_for('back') }}">Back</a></li>
+                            <li><a href="{{ url_for('biceps') }}">Biceps</a></li>
+                            <li><a href="{{ url_for('chest') }}">Chest</a></li>
+                            <li><a href="{{ url_for('legs') }}">Legs</a></li>
+                            <li><a href="{{ url_for('shoulders') }}">Shoulders</a></li>
+                            <li><a href="{{ url_for('triceps') }}">Triceps</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="{{ url_for('checkfit', next=request.path) }}">Checkfit</a></li>
+
+
+                </ul>
+            </nav>
+            <div id="mobile-menu-wrap"></div>
+
+        </div>
+        <!-- Offcanvas Menu Section End -->
+
+        <!-- Header Section Begin -->
+        <header class="header-section">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <!-- Logo -->
+                    <div class="col-lg-3">
+                        <div class="logo">
+                            <a href="{{ url_for('index') }}">
+                                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="">
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Navbar -->
+                    <div class="col-lg-6">
+                        <nav class="nav-menu">
+                            <ul>
+                                <!-- <li class="{% if request.endpoint == 'bmi_calculator' %}active{% endif %}">
+                                <a href="{{ url_for('bmi_calculator') }}">BMI</a>
+                            </li> -->
+                                <li class="{% if request.endpoint == 'workout_history' %}active{% endif %}">
+                                    <a href="{{ url_for('workout_history') }}">GymAi</a>
+                                </li>
+                                <li class="{% if request.endpoint == 'workout_history' %}active{% endif %}">
+                                    <a href="{{ url_for('workout_history') }}">History</a>
+                                </li>
+                                <li class="{% if request.endpoint == 'exercises' %}active{% endif %}">
+                                    <a href="{{ url_for('exercises') }}">Exercises</a>
+                                </li>
+
+                                <li><a href="#">Workout</a>
+                                    <ul class="dropdown">
+                                        <li><a href="{{ url_for('back') }}">Back</a></li>
+                                        <li><a href="{{ url_for('biceps') }}">Biceps</a></li>
+                                        <li><a href="{{ url_for('chest') }}">Chest</a></li>
+                                        <li><a href="{{ url_for('legs') }}">Legs</a></li>
+                                        <li><a href="{{ url_for('shoulders') }}">Shoulders</a></li>
+                                        <li><a href="{{ url_for('triceps') }}">Triceps</a></li>
+                                    </ul>
+                                </li>
+                                <li class="{% if request.endpoint == 'checkfit' %}active{% endif %}">
+                                    <a href="{{ url_for('checkfit', next=request.path) }}">Checkfit</a>
+                                </li>
+
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <!-- Right Side Auth Buttons -->
+                    <div class="col-lg-3">
+                        <div class="top-option d-flex justify-content-end align-items-center">
+                            <div class="auth-buttons">
+                                {% if session.user %}
+                                <span class="welcome-text me-2">{{ session.user.split('@')[0] }}</span>
+                                <a href="{{ url_for('bmi_calculator') }}" class="{{ get_bmi_class(session.user_bmi) }}"
+                                    style="font-weight: 700; margin-right: 15px; text-decoration: none;">BMI:
+                                    {{ session.user_bmi if session.user_bmi else '-' }}</a>
+                                <a href="{{ url_for('logout') }}" class="btn btn-primary btn-sm">Logout</a>
+                                {% else %}
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#loginSignupModal">
+                                    Login / Signup
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="canvas-open">
+                        <i class="fa fa-bars"></i>
+                    </div>
+                </div>
+        </header>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+
+        <!-- Main Content -->
+        {% block content %}{% endblock %}
+
+        <!-- Get In Touch Section Begin -->
+        <div class="gettouch-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="gt-text">
+                            <i class="fa fa-map-marker"></i>
+                            <p>7B Polo Ground <br />Udaipur, Rajasthan <br /> 313001</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="gt-text">
+                            <i class="fa fa-mobile"></i>
+                            <ul>
+                                <li>9460579296</li>
+                                <li>9457988888</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="gt-text email">
+                            <i class="fa fa-envelope"></i>
+                            <p>lakshyakhamesra@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="fs-about">
+
+                            <div class="fa-social">
+                                <a href="#"><i class="fa fa-facebook"></i></a>
+                                <a href="#"><i class="fa fa-twitter"></i></a>
+                                <a href="#"><i class="fa fa-youtube-play"></i></a>
+                                <a href="https://www.instagram.com/"><i class="fa fa-instagram"></i></a>
+                                <a href="#"><i class="fa  fa-envelope-o"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Get In Touch Section End -->
+
+
+
+        <!-- Search model Begin -->
+        <div class="search-model">
+            <div class="h-100 d-flex align-items-center justify-content-center">
+                <div class="search-close-switch">+</div>
+                <form class="search-model-form">
+                    <input type="text" id="search-input" placeholder="Search here.....">
+                </form>
+            </div>
+        </div>
+        <!-- Search model end -->
+
+        <!-- Js Plugins -->
+        <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/masonry.pkgd.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jquery.barfiller.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jquery.slicknav.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ url_for('static', filename='js/auth-modal.js') }}"></script>
+
+    </body>
+
+    </html>

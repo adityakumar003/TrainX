@@ -1,0 +1,7 @@
+Flask==2.3.3
+Werkzeug==2.3.7
+flask_pymongo
+flask_bcrypt
+flask_cors
+pymongo
+dnspython

@@ -1,0 +1,197 @@
+{% extends "base1.html" %}
+
+{% block title %}Gym | Workout History{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-section set-bg" 
+         data-setbg="{{ url_for('static', filename='img/breadcrumb-bg.jpg') }}">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="breadcrumb-text">
+                    <h2>Workout History</h2>
+                    <!-- <div class="bt-option">
+                        <a href="{{ url_for('index') }}">Home</a>
+                        <span>Workout History</span>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
+
+
+<!-- Workout History Section Begin -->
+<section class="choseus-section spad">
+    <div class="container">
+        <div class="section-title text-center mb-5">
+            <span>Your Fitness Journey</span>
+            <h2>{{ user.name or (user.email.split('@')[0] if user.email) or 'Member' }}'s Workout Records</h2>
+        </div>
+
+        <div id="workout-list" class="row justify-content-center">
+            <!-- Workout cards will be dynamically loaded here -->
+        </div>
+    </div>
+</section>
+<!-- Workout History Section End -->
+
+
+<!-- Edit Exercise Modal -->
+<div class="modal fade" id="exerciseModal" tabindex="-1" aria-labelledby="exerciseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exerciseModalLabel">Update Exercise</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="exerciseForm">
+          <div class="mb-3">
+            <label class="form-label">Exercise Name</label>
+            <input type="text" id="exerciseName" class="form-control" readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Reps</label>
+            <input type="number" id="reps" class="form-control" placeholder="Enter reps">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Weight (kg)</label>
+            <input type="number" id="weight" class="form-control" placeholder="Enter weight">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Calories</label>
+            <input type="number" id="calories" class="form-control" placeholder="Enter calories burned">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveExercise()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- JavaScript -->
+<script>
+let currentExercise = {};
+
+document.addEventListener("DOMContentLoaded", loadWorkouts);
+
+async function loadWorkouts() {
+    const res = await fetch('/get_workouts');
+    const data = await res.json();
+
+    const container = document.getElementById('workout-list');
+    if (!data.length) {
+        container.innerHTML = `<p class="text-center text-muted">No workouts recorded yet.</p>`;
+        return;
+    }
+
+    // Group workouts by date
+    const workoutsByDate = data.reduce((acc, workout) => {
+        const date = workout.date;
+        if (!acc[date]) {
+            acc[date] = { workouts: [], totalCalories: 0 };
+        }
+        acc[date].workouts.push(workout);
+        acc[date].totalCalories += workout.total_calories || 0;
+        return acc;
+    }, {});
+
+    container.innerHTML = Object.keys(workoutsByDate).sort((a, b) => new Date(b) - new Date(a)).map(date => {
+        const dayData = workoutsByDate[date];
+        return `
+        <div class="col-lg-8 mb-4">
+            <div class="cs-item p-4 shadow-sm rounded" style="background: #d3cdcd;">
+                <h4 class="text-danger">${date}</h4>
+                <hr>
+                ${dayData.workouts.map(workout => `
+                    <div class="mb-3">
+                        
+                        ${workout.exercises.map(ex => `
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div>
+                                        <strong>${ex.exercise_name}</strong><br>
+                                        <small>Reps: ${ex.reps || '-'} | Weight: ${ex.weight || '-'} kg | Cal: ${ex.calories || '-'}</small>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                        onclick="openExerciseModal('${workout.id}', '${ex.exercise_name}')">Edit</button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteExercise('${workout.id}', '${ex.exercise_name}')">Delete</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                        <div class="text-end">
+                            <small><b>Workout Calories:</b> ${workout.total_calories || 0}</small>
+                        </div>
+                    </div>
+                `).join('<hr class="my-3">')}
+                <hr>
+                <div class="text-end">
+                    <h4 class="text-danger"><b>Total Calories for the Day:</b> ${dayData.totalCalories}</h4>
+                </div>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+async function deleteExercise(workout_id, exercise_name) {
+    const res = await fetch('/delete_exercise', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ workout_id, exercise_name })
+    });
+
+    if (res.ok) {
+        location.reload();
+    } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete exercise. Please try again.');
+    }
+}
+
+function openExerciseModal(workout_id, name) {
+    currentExercise = { workout_id, name };
+    document.getElementById('exerciseName').value = name;
+    // Clear previous values
+    document.getElementById('reps').value = '';
+    document.getElementById('weight').value = '';
+    document.getElementById('calories').value = '';
+    const modal = new bootstrap.Modal(document.getElementById('exerciseModal'));
+    modal.show();
+}
+
+async function saveExercise() {
+    const data = {
+        workout_id: currentExercise.workout_id,
+        exercise_name: currentExercise.name,
+        reps: document.getElementById('reps').value,
+        weight: document.getElementById('weight').value,
+        calories: document.getElementById('calories').value
+    };
+
+    const res = await fetch('/update_exercise', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        alert('Exercise updated successfully!');
+        location.reload();
+    } else {
+        alert('Something went wrong.');
+    }
+}
+</script>
+
+{% endblock %}

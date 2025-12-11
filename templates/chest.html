@@ -1,0 +1,298 @@
+{% extends "base1.html" %}
+
+{% block title %}Gym | Chest{% endblock %}
+
+{% block content %}
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-section set-bg" data-setbg="{{ url_for('static', filename='img/workout/chest.jpg') }}">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="breadcrumb-text">
+                        <h2>Chest Workout</h2>
+                        <div class="bt-option">
+                            <a href="{{ url_for('index') }}">Home</a>
+                            <a href="#">Workout</a>
+                            <span>Chest</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Description Section Begin -->
+    <section class="services-section spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title">
+                        <span style="font-size: 1.5rem;">Chest Training</span>
+                        <h1 id="animated-chest-title" style="transition: color 0.2s;">BUILD A STRONG AND POWERFUL CHEST</h1>
+                        <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const title = document.getElementById('animated-chest-title');
+                            if (!title) return;
+                            const words = title.textContent.split(' ');
+                            title.innerHTML = words.map((w, i) => `<span class="chest-word" data-index="${i}" style="transition: color 0.2s;">${w}</span>`).join(' ');
+                        });
+
+                        document.addEventListener('scroll', function() {
+                            const title = document.getElementById('animated-chest-title');
+                            if (!title) return;
+                            const wordSpans = title.querySelectorAll('.chest-word');
+                            const rect = title.getBoundingClientRect();
+                            const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+                            let visible = 0;
+                            if (rect.top < windowHeight && rect.bottom > 0) {
+                                visible = Math.min(1, Math.max(0, (windowHeight - rect.top) / (windowHeight + rect.height)));
+                            }
+                            // Animate each word with a slight delay
+                            wordSpans.forEach((span, i) => {
+                                const progress = Math.min(1, Math.max(0, visible * (wordSpans.length + 1) - i));
+                                const startColor = [51, 51, 51]; // #333
+                                const endColor = [255, 255, 255];  // #ff1744
+                                const color = startColor.map((c, idx) => Math.round(c + (endColor[idx] - c) * progress));
+                                span.style.color = `rgb(${color.join(',')})`;
+                            });
+                        });
+                        </script>
+                    </div>
+                    <p class="text-center">
+                        The chest, or pectoral region, is one of the most important muscle groups for upper body strength and aesthetics. 
+                        Chest exercises primarily involve pushing movements and target the pectoralis major, pectoralis minor, and serratus anterior. 
+                        Key exercises such as the bench press, incline and decline presses, and dumbbell flyes help build overall chest mass and strength, while isolation exercises like cable crossovers, pec deck, and chest flyes focus on muscle definition and shaping. 
+                        Bodyweight movements, including push-ups and chest dips, enhance endurance and functional strength. 
+                        Incorporating a variety of free weights, machines, cables, and bodyweight exercises ensures complete chest development, while proper form, progressive overload, and adequate recovery maximize results and minimize the risk of injury.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Description Section End -->
+
+    <!-- Videos Section Begin -->
+    <section class="services-section spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="section-title">
+                    <span>Watch & Learn</span>
+                    <h2>Chest Exercise Videos</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+
+            <!-- Bench Press -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250"
+                            src="https://www.youtube.com/embed/gRVjAtPip0Y"
+                            title="Bench Press" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Bench Press</h5>
+                        <p class="card-text small text-muted">Classic chest builder focusing on overall chest mass and power.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incline Bench Press -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250"
+                            src="https://www.youtube.com/embed/DbFgADa2PL8"
+                            title="Incline Bench Press" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Incline Bench Press</h5>
+                        <p class="card-text small text-muted">Targets the upper chest and shoulders for a fuller look.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pec Deck -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250"
+                            src="https://www.youtube.com/embed/eozdVDA78K0"
+                            title="Pec Deck" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Pec Deck</h5>
+                        <p class="card-text small text-muted">Isolates the chest muscles for stretch and contraction.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Machine Chest Press -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250"
+                            src="https://www.youtube.com/embed/n8TOta_pfr4"
+                            title="Machine Chest Press" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Machine Chest Press</h5>
+                        <p class="card-text small text-muted">Beginner-friendly exercise for controlled chest activation.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chest Dips -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250"
+                            src="https://www.youtube.com/embed/4la6BkUBLgo"
+                            title="Chest Dips" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Chest Dips</h5>
+                        <p class="card-text small text-muted">Great bodyweight move focusing on lower chest development.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cable Crossovers -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250"
+                            src="https://www.youtube.com/embed/taI4XduLpTk"
+                            title="Cable Crossovers" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Cable Crossovers</h5>
+                        <p class="card-text small text-muted">Perfect for shaping and isolating chest muscles.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incline Dumbbell Press -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250"
+                            src="https://www.youtube.com/embed/8iPEnn-ltC8"
+                            title="Incline Dumbbell Press" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Incline Dumbbell Press</h5>
+                        <p class="card-text small text-muted">Strengthens the upper chest with greater motion range.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dumbbell Flyes (Flat Bench) -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250"
+                            src="https://www.youtube.com/embed/_LwuS1PdbdM"
+                            title="Dumbbell Flyes" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Dumbbell Flyes (Flat Bench)</h5>
+                        <p class="card-text small text-muted">Stretches and isolates chest for muscle shaping.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incline Dumbbell Flyes -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250"
+                            src="https://www.youtube.com/embed/bDaIL_zKbGs"
+                            title="Incline Dumbbell Flyes" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Incline Dumbbell Flyes</h5>
+                        <p class="card-text small text-muted">Focuses on isolating and shaping the upper chest.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chest Fly (Cable) -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250"
+                            src="https://www.youtube.com/embed/VJqgqLJdC0s"
+                            title="Chest Fly" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Chest Fly (Cable)</h5>
+                        <p class="card-text small text-muted">Excellent for chest definition and constant tension.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Iso-Lateral Chest Press -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250"
+                            src="https://www.youtube.com/embed/fhWpA8TLcU4"
+                            title="Iso-Lateral Chest Press" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Iso-Lateral Chest Press</h5>
+                        <p class="card-text small text-muted">A machine-based press that trains each side independently.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250"
+                            src="https://www.youtube.com/embed/-w6r23P-fy8"
+                            title="Incline Dumbbell Flyes" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Incline Dumbbell Flyes</h5>
+                        <p class="card-text small text-muted">Focuses on isolating and shaping the upper chest.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+    <!-- Videos Section End -->
+
+{% endblock %}

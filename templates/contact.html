@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Gym | Contact{% endblock %}
+
+{% block content %}
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-section set-bg" data-setbg="{{ url_for('static', filename='img/breadcrumb-bg.jpg') }}">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="breadcrumb-text">
+                        <h2>Contact Us</h2>
+                        <div class="bt-option">
+                            <a href="{{ url_for('index') }}">Home</a>
+                            <!-- <a href="#">Pages</a> -->
+                            <span>Contact us</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Contact Section Begin -->
+    <section class="contact-section spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="section-title contact-title">
+                        <span>Contact Us</span>
+                        <h2>GET IN TOUCH</h2>
+                    </div>
+                    <div class="contact-widget">
+                        <div class="cw-text">
+                            <i class="fa fa-map-marker"></i>
+                            <p>7B Polo Ground<br/> Udaipur,Rajasthan <br/>313001</p>
+                        </div>
+                        <div class="cw-text">
+                            <i class="fa fa-mobile"></i>
+                            <ul>
+                                <li>9460579296</li>
+                                <li>9460578888</li>
+                            </ul>
+                        </div>
+                        <div class="cw-text email">
+                            <i class="fa fa-envelope"></i>
+                            <p>lakshyakhamesra@gmail.com</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="leave-comment">
+                        <form action="#">
+                            <input type="text" placeholder="Name">
+                            <input type="text" placeholder="Email">
+                            <input type="text" placeholder="Website">
+                            <textarea placeholder="Comment"></textarea>
+                            <button type="submit">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="map">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3627.4604545338766!2d73.68637687481859!3d24.607810055321814!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3967e51ac8e233fb%3A0x2498eff97f262e9e!2sField%20Club!5e0!3m2!1sen!2sin!4v1759338124585!5m2!1sen!2sin" 
+                width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+    </section>
+    <!-- Contact Section End -->
+
+{% endblock %}

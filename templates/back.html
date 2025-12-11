@@ -1,0 +1,220 @@
+{% extends "base1.html" %}
+
+{% block title %}Gym | Back{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-section set-bg" data-setbg="{{ url_for('static', filename='img/workout/back.jpg') }}">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="breadcrumb-text">
+                    <h2>Back Workout</h2>
+                    <div class="bt-option">
+                        <a href="{{ url_for('index') }}">Home</a>
+                        <a href="#">Workout</a>
+                        <span>Back</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
+
+<!-- Description Section Begin -->
+<section class="services-section spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="section-title">
+                    <span style="font-size: 1.5rem;">Back Training</span>
+                    <h1 id="animated-chest-title" style="transition: color 0.2s;">BUILD A STRONG AND POWERFUL BACK</h1>
+                        <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const title = document.getElementById('animated-chest-title');
+                            if (!title) return;
+                            const words = title.textContent.split(' ');
+                            title.innerHTML = words.map((w, i) => `<span class="chest-word" data-index="${i}" style="transition: color 0.2s;">${w}</span>`).join(' ');
+                        });
+
+                        document.addEventListener('scroll', function() {
+                            const title = document.getElementById('animated-chest-title');
+                            if (!title) return;
+                            const wordSpans = title.querySelectorAll('.chest-word');
+                            const rect = title.getBoundingClientRect();
+                            const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+                            let visible = 0;
+                            if (rect.top < windowHeight && rect.bottom > 0) {
+                                visible = Math.min(1, Math.max(0, (windowHeight - rect.top) / (windowHeight + rect.height)));
+                            }
+                            // Animate each word with a slight delay
+                            wordSpans.forEach((span, i) => {
+                                const progress = Math.min(1, Math.max(0, visible * (wordSpans.length + 1) - i));
+                                const startColor = [51, 51, 51]; // #333
+                                const endColor = [255, 255, 255];  // #ff1744
+                                const color = startColor.map((c, idx) => Math.round(c + (endColor[idx] - c) * progress));
+                                span.style.color = `rgb(${color.join(',')})`;
+                            });
+                        });
+                        </script>
+                </div>
+                <p class="text-center">
+                    The back is one of the most important muscle groups for posture, strength, and overall physique. Back exercises target muscles such as the latissimus dorsi, trapezius, rhomboids, rear deltoids, and erector spinae. Compound movements like pull-ups, barbell rows, and deadlifts develop thickness and strength, while isolation exercises like face pulls, cable rows, and chest-supported incline rows focus on definition and symmetry. Incorporating a mix of free weights, machines, cables, and bodyweight exercises ensures full back development, enhances posture, and reduces the risk of injury.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Description Section End -->
+
+<!-- Videos Section Begin -->
+<section class="services-section spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="section-title">
+                    <span>Watch & Learn</span>
+                    <h2>Back Exercise Videos</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+
+            <!-- Pull-Ups -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250" src="https://www.youtube.com/embed/eGo4IYlbE5g" title="Pull-Ups" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Pull-Ups</h5>
+                        <p class="card-text small text-muted">Bodyweight exercise targeting lats, biceps, and shoulders for width.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lat Pulldown -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250" src="https://www.youtube.com/embed/CAwf7n6Luuc" title="Lat Pulldown" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Lat Pulldown</h5>
+                        <p class="card-text small text-muted">Great for beginners, targets lats and biceps with controlled motion.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barbell Bent-Over Row -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250" src="https://www.youtube.com/embed/vT2GjY_Umpw" title="Barbell Bent-Over Row" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Barbell Bent-Over Row</h5>
+                        <p class="card-text small text-muted">Builds middle back thickness and engages traps and rhomboids.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dumbbell Single-Arm Row -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250" src="https://www.youtube.com/embed/pYcpY20QaE8" title="Dumbbell Single-Arm Row" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Dumbbell Single-Arm Row</h5>
+                        <p class="card-text small text-muted">Targets each side individually for balanced back development.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- T-Bar Row -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250" src="https://www.youtube.com/embed/yPis7nlbqdY" title="T-Bar Row" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">T-Bar Row</h5>
+                        <p class="card-text small text-muted">Builds thickness in middle back and improves grip strength.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seated Cable Row -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250" src="https://www.youtube.com/embed/IODxDxX7oi4" title="Seated Cable Row" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Seated Cable Row</h5>
+                        <p class="card-text small text-muted">Maintains constant tension while strengthening lats, traps, and rhomboids.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Face Pulls -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250" src="https://www.youtube.com/embed/rep-qVOkqgk" title="Face Pulls" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Face Pulls</h5>
+                        <p class="card-text small text-muted">Strengthens rear delts, traps, and improves posture.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deadlift -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250" src="https://www.youtube.com/embed/op9kVnSso6Q" title="Deadlift" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Deadlift</h5>
+                        <p class="card-text small text-muted">Full posterior chain exercise, strengthens lower back, traps, and glutes.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hyperextensions (Back Extensions) -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250" src="https://www.youtube.com/embed/4pKly2JojMw" title="Hyperextensions" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Hyperextensions (Back Extensions)</h5>
+                        <p class="card-text small text-muted">Targets lower back and glutes, improving posture and core stability.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chest Supported Incline Row -->
+            <div class="col-lg-6 col-md-8 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <iframe width="100%" height="250" src="https://www.youtube.com/embed/0UBRfiO4zDs" title="Chest Supported Incline Row" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <h5 class="card-title mb-1">Chest Supported Incline Row</h5>
+                        <p class="card-text small text-muted">Isolation row that focuses on mid-back thickness without straining the lower back.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+<!-- Videos Section End -->
+
+{% endblock %}

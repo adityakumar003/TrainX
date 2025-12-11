@@ -1,0 +1,251 @@
+{% extends "base1.html" %}
+
+{% block title %}Gym | Shoulders{% endblock %}
+
+{% block content %}
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-section set-bg" data-setbg="{{ url_for('static', filename='img/workout/shoulders.jpg') }}">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="breadcrumb-text">
+                        <h2>Shoulder Workout</h2>
+                        <div class="bt-option">
+                            <a href="{{ url_for('index') }}">Home</a>
+                            <a href="#">Workout</a>
+                            <span>Shoulders</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Description Section Begin -->
+    <section class="services-section spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title">
+                        <span style="font-size: 1.5rem;">Shoulder Training</span>
+                        <h1 id="animated-shoulders-title" style="transition: color 0.2s;">BUILD STRONG, ROUNDED, AND STABLE SHOULDERS</h1>
+                        <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const title = document.getElementById('animated-shoulders-title');
+                            if (!title) return;
+                            const words = title.textContent.split(' ');
+                            title.innerHTML = words.map((w, i) => `<span class="shoulders-word" data-index="${i}" style="transition: color 0.2s;">${w}</span>`).join(' ');
+                        });
+
+                        document.addEventListener('scroll', function() {
+                            const title = document.getElementById('animated-shoulders-title');
+                            if (!title) return;
+                            const wordSpans = title.querySelectorAll('.shoulders-word');
+                            const rect = title.getBoundingClientRect();
+                            const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+                            let visible = 0;
+                            if (rect.top < windowHeight && rect.bottom > 0) {
+                                visible = Math.min(1, Math.max(0, (windowHeight - rect.top) / (windowHeight + rect.height)));
+                            }
+                            wordSpans.forEach((span, i) => {
+                                const progress = Math.min(1, Math.max(0, visible * (wordSpans.length + 1) - i));
+                                const startColor = [51, 51, 51]; 
+                                const endColor = [255, 255, 255]; 
+                                const color = startColor.map((c, idx) => Math.round(c + (endColor[idx] - c) * progress));
+                                span.style.color = `rgb(${color.join(',')})`;
+                            });
+                        });
+                        </script>
+                    </div>
+                    <p class="text-center">
+                        Strong, well-developed shoulders create the foundation of a powerful and aesthetic upper body. 
+                        Shoulder workouts primarily target the three deltoid heads — anterior (front), lateral (side), and posterior (rear) — along with the trapezius and rotator cuff muscles for stability. 
+                        Compound lifts like the overhead press and push press build mass and strength, while isolation moves such as lateral raises, front raises, and reverse flyes enhance definition and symmetry. 
+                        Balanced shoulder training improves posture, enhances performance in other lifts, and reduces the risk of injuries by supporting joint stability and mobility.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Description Section End -->
+
+    <!-- Videos Section Begin -->
+    <section class="services-section spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="section-title">
+                        <span>Watch & Learn</span>
+                        <h2>Shoulder Exercise Videos</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+
+                <!-- Overhead Barbell Press -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/2yjwXTZQDDI"
+                                title="Overhead Barbell Press" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Overhead Barbell Press</h5>
+                            <p class="card-text small text-muted">A compound lift that builds overall shoulder mass and strength.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dumbbell Shoulder Press -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/B-aVuyhvLHU"
+                                title="Dumbbell Shoulder Press" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Dumbbell Shoulder Press</h5>
+                            <p class="card-text small text-muted">Engages all deltoid heads with a natural range of motion.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lateral Raises -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/3VcKaXpzqRo"
+                                title="Lateral Raises" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Lateral Raises</h5>
+                            <p class="card-text small text-muted">Isolates the side delts for rounder, wider shoulders.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Front Raises -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/-t7fuZ0KhDA"
+                                title="Front Raises" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Front Raises</h5>
+                            <p class="card-text small text-muted">Emphasizes the front delts for anterior shoulder development.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rear Delt Fly -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/5Jt0Qx0GJUU"
+                                title="Rear Delt Fly" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Rear Delt Fly</h5>
+                            <p class="card-text small text-muted">Targets rear delts for a balanced and strong shoulder appearance.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arnold Press -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/6Z15_WdXmVw"
+                                title="Arnold Press" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Arnold Press</h5>
+                            <p class="card-text small text-muted">A variation that targets all three deltoid heads dynamically.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upright Rows -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/dhRzY8nGQ7U"
+                                title="Upright Rows" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Upright Rows</h5>
+                            <p class="card-text small text-muted">Strengthens traps and lateral delts for fuller shoulders.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Face Pulls -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/rep-qVOkqgk"
+                                title="Face Pulls" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Face Pulls</h5>
+                            <p class="card-text small text-muted">Improves posture and shoulder health by targeting rear delts and rotator cuff.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cable Lateral Raise -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/q5sNYB1Z3tE"
+                                title="Cable Lateral Raise" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Cable Lateral Raise</h5>
+                            <p class="card-text small text-muted">Maintains constant tension for better side delt engagement.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Push Press -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/iaBVSJm78ko"
+                                title="Push Press" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Push Press</h5>
+                            <p class="card-text small text-muted">A power-based movement to enhance shoulder explosiveness.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <!-- Videos Section End -->
+{% endblock %}

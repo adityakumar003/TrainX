@@ -1,0 +1,252 @@
+{% extends "base1.html" %}
+
+{% block title %}Gym | Legs{% endblock %}
+
+{% block content %}
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-section set-bg" data-setbg="{{ url_for('static', filename='img/workout/legs.jpg') }}">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="breadcrumb-text">
+                        <h2>Leg Workout</h2>
+                        <div class="bt-option">
+                            <a href="{{ url_for('index') }}">Home</a>
+                            <a href="#">Workout</a>
+                            <span>Legs</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Description Section Begin -->
+    <section class="services-section spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title">
+                        <span style="font-size: 1.5rem;">Leg Training</span>
+                        <h1 id="animated-legs-title" style="transition: color 0.2s;">BUILD STRONG, POWERFUL, AND BALANCED LEGS</h1>
+                        <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const title = document.getElementById('animated-legs-title');
+                            if (!title) return;
+                            const words = title.textContent.split(' ');
+                            title.innerHTML = words.map((w, i) => `<span class="legs-word" data-index="${i}" style="transition: color 0.2s;">${w}</span>`).join(' ');
+                        });
+
+                        document.addEventListener('scroll', function() {
+                            const title = document.getElementById('animated-legs-title');
+                            if (!title) return;
+                            const wordSpans = title.querySelectorAll('.legs-word');
+                            const rect = title.getBoundingClientRect();
+                            const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+                            let visible = 0;
+                            if (rect.top < windowHeight && rect.bottom > 0) {
+                                visible = Math.min(1, Math.max(0, (windowHeight - rect.top) / (windowHeight + rect.height)));
+                            }
+                            wordSpans.forEach((span, i) => {
+                                const progress = Math.min(1, Math.max(0, visible * (wordSpans.length + 1) - i));
+                                const startColor = [51, 51, 51]; 
+                                const endColor = [255, 255, 255]; 
+                                const color = startColor.map((c, idx) => Math.round(c + (endColor[idx] - c) * progress));
+                                span.style.color = `rgb(${color.join(',')})`;
+                            });
+                        });
+                        </script>
+                    </div>
+                    <p class="text-center">
+                        The legs form the foundation of your body’s strength and stability. Training them improves overall performance, balance, and power. 
+                        Leg workouts primarily target major muscle groups like the quadriceps, hamstrings, glutes, and calves. 
+                        Compound exercises such as squats, deadlifts, and lunges build mass and strength, while isolation movements like leg curls and calf raises enhance muscle definition and symmetry. 
+                        Strong legs are essential for athletic performance, posture, and injury prevention. 
+                        Combining strength and endurance training with proper form and recovery ensures comprehensive leg development and lower-body power.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Description Section End -->
+
+    <!-- Videos Section Begin -->
+    <section class="services-section spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="section-title">
+                        <span>Watch & Learn</span>
+                        <h2>Leg Exercise Videos</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+
+                <!-- Barbell Squat -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/aclHkVaku9U"
+                                title="Barbell Squat" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Barbell Squat</h5>
+                            <p class="card-text small text-muted">The king of leg exercises targeting quads, glutes, and hamstrings.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Romanian Deadlift -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/_oyxCn2iSjU"
+                                title="Romanian Deadlift" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Romanian Deadlift</h5>
+                            <p class="card-text small text-muted">Targets hamstrings and glutes while strengthening the posterior chain.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leg Press -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/IZxyjW7MPJQ"
+                                title="Leg Press" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Leg Press</h5>
+                            <p class="card-text small text-muted">Builds overall leg mass safely with machine support.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Walking Lunges -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/D7KaRcUTQeE"
+                                title="Walking Lunges" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Walking Lunges</h5>
+                            <p class="card-text small text-muted">Improves balance and strength across the entire lower body.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulgarian Split Squat -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/2C-uNgKwPLE"
+                                title="Bulgarian Split Squat" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Bulgarian Split Squat</h5>
+                            <p class="card-text small text-muted">Enhances unilateral leg strength and balance.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leg Extensions -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/YyvSfVjQeL0"
+                                title="Leg Extensions" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Leg Extensions</h5>
+                            <p class="card-text small text-muted">Isolates the quadriceps for size and definition.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seated Leg Curl -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/1Tq3QdYUuHs"
+                                title="Seated Leg Curl" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Seated Leg Curl</h5>
+                            <p class="card-text small text-muted">Targets hamstrings and improves posterior leg strength.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calf Raises -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/YA-h3n9L9Cg"
+                                title="Standing Calf Raises" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Standing Calf Raises</h5>
+                            <p class="card-text small text-muted">Builds strength and shape in the calves for balanced legs.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step-Ups -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/dQqApCGd5Ss"
+                                title="Step-Ups" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Step-Ups</h5>
+                            <p class="card-text small text-muted">Great for unilateral leg development and coordination.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sumo Deadlift -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/1ZXobu7JvvE"
+                                title="Sumo Deadlift" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Sumo Deadlift</h5>
+                            <p class="card-text small text-muted">Strengthens glutes, hamstrings, and inner thighs with a wider stance.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <!-- Videos Section End -->
+{% endblock %}

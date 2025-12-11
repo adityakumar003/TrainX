@@ -1,0 +1,250 @@
+{% extends "base1.html" %}
+
+{% block title %}Gym | Triceps{% endblock %}
+
+{% block content %}
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-section set-bg" data-setbg="{{ url_for('static', filename='img/workout/triceps.jpg') }}">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="breadcrumb-text">
+                        <h2>Triceps Workout</h2>
+                        <div class="bt-option">
+                            <a href="{{ url_for('index') }}">Home</a>
+                            <a href="#">Workout</a>
+                            <span>Triceps</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Description Section Begin -->
+    <section class="services-section spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title">
+                        <span style="font-size: 1.5rem;">Triceps Training</span>
+                        <h1 id="animated-triceps-title" style="transition: color 0.2s;">BUILD POWERFUL AND DEFINED TRICEPS</h1>
+                        <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const title = document.getElementById('animated-triceps-title');
+                            if (!title) return;
+                            const words = title.textContent.split(' ');
+                            title.innerHTML = words.map((w, i) => `<span class="triceps-word" data-index="${i}" style="transition: color 0.2s;">${w}</span>`).join(' ');
+                        });
+
+                        document.addEventListener('scroll', function() {
+                            const title = document.getElementById('animated-triceps-title');
+                            if (!title) return;
+                            const wordSpans = title.querySelectorAll('.triceps-word');
+                            const rect = title.getBoundingClientRect();
+                            const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+                            let visible = 0;
+                            if (rect.top < windowHeight && rect.bottom > 0) {
+                                visible = Math.min(1, Math.max(0, (windowHeight - rect.top) / (windowHeight + rect.height)));
+                            }
+                            wordSpans.forEach((span, i) => {
+                                const progress = Math.min(1, Math.max(0, visible * (wordSpans.length + 1) - i));
+                                const startColor = [51, 51, 51]; 
+                                const endColor = [255, 255, 255]; 
+                                const color = startColor.map((c, idx) => Math.round(c + (endColor[idx] - c) * progress));
+                                span.style.color = `rgb(${color.join(',')})`;
+                            });
+                        });
+                        </script>
+                    </div>
+                    <p class="text-center">
+                        The triceps brachii make up nearly two-thirds of your upper arm’s mass and play a vital role in pressing strength and arm aesthetics. 
+                        Effective triceps training combines both compound and isolation exercises to target all three heads — long, lateral, and medial. 
+                        From close-grip bench presses to pushdowns and kickbacks, a balanced triceps routine enhances your pushing power, arm size, and muscle definition.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Description Section End -->
+
+    <!-- Videos Section Begin -->
+    <section class="services-section spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="section-title">
+                        <span>Watch & Learn</span>
+                        <h2>Triceps Exercise Videos</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+
+                <!-- Close-Grip Bench Press -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/Eh00_rniF8E"
+                                title="Close-Grip Bench Press" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Close-Grip Bench Press</h5>
+                            <p class="card-text small text-muted">Builds mass and pressing strength by emphasizing the triceps over the chest.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Triceps Dips -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/0326dy_-CzM"
+                                title="Triceps Dips" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Triceps Dips</h5>
+                            <p class="card-text small text-muted">A bodyweight powerhouse for triceps strength and size.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overhead Dumbbell Extension -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/_gsUck-7M74"
+                                title="Overhead Dumbbell Extension" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Overhead Dumbbell Extension</h5>
+                            <p class="card-text small text-muted">Targets the long head for full triceps development.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rope Pushdowns -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/vB5OHsJ3EME"
+                                title="Rope Triceps Pushdown" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Rope Triceps Pushdown</h5>
+                            <p class="card-text small text-muted">Focuses on contraction and definition through controlled movement.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skull Crushers -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/d_KZxkY_0cM"
+                                title="Skull Crushers" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Skull Crushers</h5>
+                            <p class="card-text small text-muted">Excellent isolation move hitting all triceps heads.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Diamond Push-Ups -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/J0DnG1_S92I"
+                                title="Diamond Push-Ups" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Diamond Push-Ups</h5>
+                            <p class="card-text small text-muted">A bodyweight killer for triceps definition and endurance.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dumbbell Kickbacks -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/6SS6K3lAwZ8"
+                                title="Dumbbell Kickbacks" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Dumbbell Kickbacks</h5>
+                            <p class="card-text small text-muted">Isolates the lateral head for detailed arm shaping.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overhead Cable Extension -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/4q1o-5J9fL0"
+                                title="Overhead Cable Extension" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Overhead Cable Extension</h5>
+                            <p class="card-text small text-muted">Provides constant resistance to fully stretch and contract the triceps.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bench Dips -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/IODxDxX7oi4"
+                                title="Bench Dips" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Bench Dips</h5>
+                            <p class="card-text small text-muted">Great for beginners to strengthen triceps with bodyweight.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reverse-Grip Pushdown -->
+                <div class="col-lg-6 col-md-8 mb-4">
+                    <div class="card h-100 text-center">
+                        <div class="card-body">
+                            <iframe width="100%" height="250"
+                                src="https://www.youtube.com/embed/2-LAMcpzODU"
+                                title="Reverse-Grip Pushdown" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <h5 class="card-title mb-1">Reverse-Grip Pushdown</h5>
+                            <p class="card-text small text-muted">Emphasizes the medial head for complete triceps development.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <!-- Videos Section End -->
+{% endblock %}

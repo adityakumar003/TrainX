@@ -1,0 +1,170 @@
+{% extends "base1.html" %}
+
+{% block title %}Gym | BMI Calculator{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-section set-bg" data-setbg="{{ url_for('static', filename='img/breadcrumb-bg.jpg') }}">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="breadcrumb-text">
+                    <h2>BMI calculator</h2>
+                    <!-- <div class="bt-option">
+                            <a href="{{ url_for('index') }}">Home</a>
+                            <a href="#">Pages</a>
+                            <span>BMI calculator</span>
+                        </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
+
+<!-- BMI Calculator Section Begin -->
+<section class="bmi-calculator-section spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="section-title chart-title">
+                    <span>check your body</span>
+                    <h2>BMI CALCULATOR CHART</h2>
+                </div>
+                <div class="chart-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Bmi</th>
+                                <th>WEIGHT STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="point">Below 18.5</td>
+                                <td>Underweight</td>
+                            </tr>
+                            <tr>
+                                <td class="point">18.5 - 24.9</td>
+                                <td>Healthy</td>
+                            </tr>
+                            <tr>
+                                <td class="point">25.0 - 29.9</td>
+                                <td>Overweight</td>
+                            </tr>
+                            <tr>
+                                <td class="point">30.0 - and Above</td>
+                                <td>Obese</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="section-title chart-calculate-title">
+                    <span>check your body</span>
+                    <h2>CALCULATE YOUR BMI</h2>
+                </div>
+                <div class="chart-calculate-form">
+                    <p>Enter your details below to calculate your Body Mass Index (BMI).</p>
+                    <form id="bmiForm" onsubmit="return calculateBMI(event)">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <input type="number" id="height" placeholder="Height / cm" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="number" id="weight" placeholder="Weight / kg" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="number" id="age" placeholder="Age" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <select id="sex" required
+                                    style="width: 100%; height: 50px; border: 1px solid #363636; padding-left: 20px; background: transparent; color: #c4c4c4;">
+                                    <option value="">Select Sex</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-12">
+                                <button type="submit">Calculate</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Result will appear here -->
+                    <div id="bmiResult"
+                        style="margin-top: 20px; background: #0a0a0a; border: 1px solid #363636; padding: 18px; display: none;">
+                        <h6 style="color:#ffffff; margin-bottom: 8px;">Your BMI</h6>
+                        <div style="color:#ffffff; font-size:16px; margin-bottom: 6px;">Value: <span id="bmiValue"
+                                style="color:#f36100; font-weight:700;">-</span></div>
+                        <div style="color:#ffffff; font-size:16px;">Status: <span id="bmiStatus"
+                                style="color:#f36100; font-weight:700;">-</span></div>
+                    </div>
+                </div>
+
+                <script>
+                    async function calculateBMI(event) {
+                        event.preventDefault(); // prevent page reload
+
+                        let height = parseFloat(document.getElementById("height").value);
+                        let weight = parseFloat(document.getElementById("weight").value);
+                        let age = parseInt(document.getElementById("age").value);
+                        let sex = document.getElementById("sex").value;
+
+                        const resultBox = document.getElementById("bmiResult");
+                        const valueSpan = document.getElementById("bmiValue");
+                        const statusSpan = document.getElementById("bmiStatus");
+
+                        if (!height || !weight || !age || !sex) {
+                            if (resultBox) {
+                                resultBox.style.display = 'block';
+                                resultBox.innerHTML = '<span style="color:#f36100; font-weight:700;">⚠️ Please fill in all fields.</span>';
+                            }
+                            return false;
+                        }
+
+                        try {
+                            const response = await fetch("{{ url_for('calculate_bmi') }}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ height, weight, age, sex })
+                            });
+
+                            if (response.ok) {
+                                const data = await response.json();
+                                if (valueSpan && statusSpan && resultBox) {
+                                    valueSpan.textContent = data.bmi;
+                                    statusSpan.textContent = data.status;
+                                    resultBox.style.display = 'block';
+
+                                    // Update the header value without reload if possible, otherwise reload
+                                    // Simple reload to reflect changes in header
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 2000); // Wait 2 secs so user sees result first
+                                }
+                            } else {
+                                const err = await response.json();
+                                if (resultBox) {
+                                    resultBox.style.display = 'block';
+                                    resultBox.innerHTML = `<span style="color:#f36100; font-weight:700;">⚠️ ${err.error || 'Error'}</span>`;
+                                }
+                            }
+                        } catch (e) {
+                            console.error(e);
+                        }
+
+                        return false;
+                    }
+                </script>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- BMI Calculator Section End -->
+
+{% endblock %}
