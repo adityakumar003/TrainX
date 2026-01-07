@@ -1,3 +1,14 @@
+# Flask Web Application Dependencies
+Flask==2.3.3
+Werkzeug==2.3.7
+flask_pymongo
+flask_bcrypt
+flask_cors
+pymongo
+dnspython
+python-dotenv
+
+# Pose Detection / AI Module Dependencies
 absl-py==2.3.1
 attrs==25.3.0
 cffi==1.17.1
@@ -19,6 +30,7 @@ packaging==25.0
 pillow==11.3.0
 protobuf==3.20.3
 pycparser==2.22
+pygame
 pyparsing==3.2.3
 python-dateutil==2.9.0.post0
 scipy==1.15.3

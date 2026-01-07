@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from dotenv import load_dotenv
 import os
 import csv
 import urllib.request
@@ -13,6 +14,9 @@ import sys
 import subprocess
 from bson.objectid import ObjectId
 
+# Load environment variables from .env file
+load_dotenv()
+
 app = Flask(__name__)
 
 CORS(app)
@@ -21,7 +25,7 @@ CORS(app)
 app.secret_key = "supersecretkey"
 
 # MongoDB Configuration (single source of truth)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/gymlife"
+app.config["MONGO_URI"] = os.getenv("MONGODB_URI")
 mongo = PyMongo(app)
 
 # Collections

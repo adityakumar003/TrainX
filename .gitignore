@@ -1,0 +1,39 @@
+# Python virtual environments
+.venv/
+gymlife_env/
+gymlife_complete_env/
+pose_detection1/gymlife_env/
+flask_env/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+
+# Snapshots from pose detection
+pose_detection1/snapshots/
+snapshots/
