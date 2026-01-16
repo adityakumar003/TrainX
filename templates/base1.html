@@ -100,6 +100,7 @@ bmi-default
                             <li><a href="{{ url_for('triceps') }}">Triceps</a></li>
                         </ul>
                     </li>
+                    <li><a href="{{ url_for('diet') }}">Diet</a></li>
                     <li><a href="{{ url_for('checkfit', next=request.path) }}">Checkfit</a></li>
 
 
@@ -149,6 +150,9 @@ bmi-default
                                         <li><a href="{{ url_for('shoulders') }}">Shoulders</a></li>
                                         <li><a href="{{ url_for('triceps') }}">Triceps</a></li>
                                     </ul>
+                                </li>
+                                <li class="{% if request.endpoint == 'diet' %}active{% endif %}">
+                                    <a href="{{ url_for('diet') }}">Diet</a>
                                 </li>
                                 <li class="{% if request.endpoint == 'checkfit' %}active{% endif %}">
                                     <a href="{{ url_for('checkfit', next=request.path) }}">Checkfit</a>

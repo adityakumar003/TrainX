@@ -8,6 +8,9 @@ pymongo
 dnspython
 python-dotenv
 
+# AI Integration
+google-generativeai
+
 # Pose Detection / AI Module Dependencies
 absl-py==2.3.1
 attrs==25.3.0

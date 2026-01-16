@@ -12,7 +12,10 @@ import urllib.error
 import uuid
 import sys
 import subprocess
+import json
+import re
 from bson.objectid import ObjectId
+import google.generativeai as genai
 
 # Load environment variables from .env file
 load_dotenv()
@@ -30,6 +33,18 @@ mongo = PyMongo(app)
 
 # Collections
 users = mongo.db.users
+
+# Configure Gemini AI
+gemini_api_key = os.getenv("GEMINI_API_KEY")
+if gemini_api_key:
+    genai.configure(api_key=gemini_api_key)
+    # Use models/gemini-2.5-flash which is confirmed to work with this API key
+    model = genai.GenerativeModel('models/gemini-2.5-flash')
+else:
+    model = None
+    print("Warning: GEMINI_API_KEY not found in environment variables")
+
+
 
 @app.route('/add_workout', methods=['POST'])
 def add_workout():
@@ -535,6 +550,118 @@ def checkfit_desktop():
     # Redirect to the 'next' param (current page), or referrer, or fallback to workout_history
     next_page = request.args.get('next')
     return redirect(next_page or request.referrer or url_for('workout_history'))
+
+
+@app.route('/diet')
+def diet():
+    """Diet page with bulking/cutting options"""
+    if 'user_id' not in session:
+        flash('Please login to access diet plans.', 'warning')
+        return redirect(url_for('index'))
+    
+    user = users.find_one({"_id": ObjectId(session['user_id'])})
+    return render_template('diet.html', user=user)
+
+
+@app.route('/generate_meal_plan', methods=['POST'])
+def generate_meal_plan():
+    """Generate personalized meal plan using Gemini AI"""
+    if 'user_id' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    if not model:
+        return jsonify({'error': 'Gemini API not configured'}), 500
+    
+    data = request.get_json()
+    goal = data.get('goal', 'bulking').lower()  # 'bulking' or 'cutting'
+    
+    if goal not in ['bulking', 'cutting']:
+        return jsonify({'error': 'Invalid goal. Must be bulking or cutting'}), 400
+    
+    user = users.find_one({"_id": ObjectId(session['user_id'])})
+    
+    # Get user data
+    bmi = user.get('bmi', 22)
+    weight = user.get('weight', 70)
+    height = user.get('height', 170)
+    age = user.get('age', 25)
+    sex = user.get('sex', 'male')
+    
+    # Check if we already generated a plan today
+    today = datetime.now().strftime("%Y-%m-%d")
+    cached_plan_date = user.get(f'meal_plan_{goal}_date')
+    
+    if cached_plan_date == today:
+        # Return cached plan
+        cached_plan = user.get(f'meal_plan_{goal}')
+        if cached_plan:
+            return jsonify(cached_plan)
+    
+    # Generate new meal plan
+    prompt = f"""Create a detailed {goal} meal plan for a {sex} with:
+- BMI: {bmi}
+- Weight: {weight} kg
+- Height: {height} cm
+- Age: {age} years
+
+Provide 5 meals with realistic portions and nutritional information:
+1. Pre-workout meal (light, energizing)
+2. Post-workout meal (protein-rich for recovery)
+3. Breakfast (balanced, nutritious)
+4. Lunch (main meal, substantial)
+5. Dinner (lighter than lunch)
+
+For each meal, provide:
+- name: A descriptive meal name
+- calories: Total calories (number)
+- protein: Protein in grams (number)
+- carbs: Carbohydrates in grams (number)
+- fats: Fats in grams (number)
+- description: Brief description of the meal and ingredients
+
+Format your response as valid JSON with this exact structure:
+{{
+    "pre_workout": {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
+    "post_workout": {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
+    "breakfast": {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
+    "lunch": {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
+    "dinner": {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}}
+}}
+
+Guidelines for {goal}:
+{"- High calorie surplus (300-500 cal above maintenance)" if goal == "bulking" else "- Calorie deficit (300-500 cal below maintenance)"}
+{"- High protein (1.6-2.2g per kg bodyweight)" if goal == "bulking" else "- Very high protein (2.0-2.5g per kg bodyweight) to preserve muscle"}
+{"- Moderate to high carbs for energy and muscle growth" if goal == "bulking" else "- Moderate carbs, focus on complex carbs"}
+{"- Healthy fats for hormone production" if goal == "bulking" else "- Lower fats to create calorie deficit"}
+
+Make it realistic, healthy, and achievable. Use common foods available in India.
+"""
+    
+    try:
+        response = model.generate_content(prompt)
+        meal_plan_text = response.text
+        
+        # Extract JSON from response
+        json_match = re.search(r'\{.*\}', meal_plan_text, re.DOTALL)
+        if json_match:
+            meal_plan = json.loads(json_match.group())
+            
+            # Save to database
+            users.update_one(
+                {"_id": ObjectId(session['user_id'])},
+                {"$set": {
+                    f"meal_plan_{goal}": meal_plan,
+                    f"meal_plan_{goal}_date": today
+                }}
+            )
+            
+            return jsonify(meal_plan)
+        else:
+            return jsonify({'error': 'Could not parse meal plan from AI response'}), 500
+    
+    except Exception as e:
+        print(f"Error generating meal plan: {str(e)}")
+        return jsonify({'error': f'Failed to generate meal plan: {str(e)}'}), 500
 
 
 if __name__ == '__main__':

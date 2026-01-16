@@ -11,5 +11,8 @@ pymongo
 dnspython
 python-dotenv
 
+# AI Integration
+google-generativeai
+
 # Production WSGI Server
 gunicorn==21.2.0

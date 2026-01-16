@@ -1,0 +1,420 @@
+{% extends "base1.html" %}
+
+{% block title %}Diet Plans | GymLife{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-section set-bg" data-setbg="{{ url_for('static', filename='img/breadcrumb-bg.jpg') }}">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="breadcrumb-text">
+                    <h2>AI Diet Plans</h2>
+                    <div class="bt-option">
+                        <a href="{{ url_for('workout_history') }}">Dashboard</a>
+                        <span>Diet</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
+
+<!-- Diet Section Begin -->
+<section class="choseus-section spad">
+    <div class="container">
+        <div class="section-title text-center mb-5">
+            <span>Personalized Nutrition</span>
+            <h2>Choose Your Fitness Goal</h2>
+        </div>
+
+        {% if not user.bmi %}
+        <!-- No BMI Warning -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8">
+                <div class="cs-item p-4" style="background: #151515; text-align: center;">
+                    <h4 style="color: #f20707; margin-bottom: 20px;">⚠️ BMI Required</h4>
+                    <p style="color: #a9a9a9; margin-bottom: 20px;">Please calculate your BMI first to get personalized
+                        meal plans.</p>
+                    <a href="{{ url_for('bmi_calculator') }}" class="primary-btn btn-normal">Calculate BMI</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Goal Selection -->
+        <div class="row justify-content-center mb-5" id="goal-selection">
+            <div class="col-lg-5 col-md-6 mb-4">
+                <div class="goal-card" onclick="selectGoal('bulking')" style="cursor: pointer;">
+                    <div class="cs-item p-5 text-center" style="background: #151515; transition: all 0.3s ease;">
+                        <span style="font-size: 60px; display: block; margin-bottom: 20px;">💪</span>
+                        <h3 style="color: #ffffff; margin-bottom: 15px; font-size: 28px;">BULKING</h3>
+                        <p style="color: #a9a9a9; margin-bottom: 20px;">Build muscle mass with a calorie surplus</p>
+                        <div style="color: #f20707; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                            Click to Generate Plan
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 col-md-6 mb-4">
+                <div class="goal-card" onclick="selectGoal('cutting')" style="cursor: pointer;">
+                    <div class="cs-item p-5 text-center" style="background: #151515; transition: all 0.3s ease;">
+                        <span style="font-size: 60px; display: block; margin-bottom: 20px;">🔥</span>
+                        <h3 style="color: #ffffff; margin-bottom: 15px; font-size: 28px;">CUTTING</h3>
+                        <p style="color: #a9a9a9; margin-bottom: 20px;">Lose fat while preserving muscle</p>
+                        <div style="color: #f20707; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                            Click to Generate Plan
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="row justify-content-center mb-5" id="loading-state" style="display: none;">
+            <div class="col-lg-8">
+                <div class="cs-item p-5 text-center" style="background: #151515;">
+                    <div class="loading-spinner"
+                        style="border: 4px solid rgba(242, 7, 7, 0.3); border-top: 4px solid #f20707; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin: 0 auto 20px;">
+                    </div>
+                    <h4 style="color: #ffffff; margin-bottom: 10px;">Generating Your Meal Plan...</h4>
+                    <p style="color: #a9a9a9; margin: 0;">AI is creating a personalized plan based on your BMI</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meal Plan Display -->
+        <div id="meal-plan-container" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-lg-12 text-center">
+                    <h3 id="plan-title" style="color: #ffffff; margin-bottom: 10px;"></h3>
+                    <p style="color: #a9a9a9;">Based on your BMI: <span style="color: #f20707; font-weight: 700;">{{
+                            user.bmi }}</span></p>
+                    <button onclick="regeneratePlan()" class="primary-btn btn-normal"
+                        style="background: #252525; margin-top: 10px;">
+                        🔄 Generate New Plan
+                    </button>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Pre-Workout -->
+                <div class="col-lg-6 mb-4">
+                    <div class="meal-card cs-item p-4" style="background: #151515;">
+                        <h4 style="color: #f20707; margin-bottom: 15px;">⚡ Pre-Workout</h4>
+                        <h5 id="pre-workout-name" style="color: #ffffff; margin-bottom: 10px;"></h5>
+                        <p id="pre-workout-desc" style="color: #a9a9a9; margin-bottom: 15px; font-size: 14px;"></p>
+                        <div class="nutrition-info" style="background: #0a0a0a; padding: 15px; border-radius: 4px;">
+                            <div class="row text-center">
+                                <div class="col-3">
+                                    <div style="color: #f20707; font-size: 20px; font-weight: 700;"
+                                        id="pre-workout-cal">0</div>
+                                    <div style="color: #a9a9a9; font-size: 12px;">Calories</div>
+                                </div>
+                                <div class="col-3">
+                                    <div style="color: #ffffff; font-size: 20px; font-weight: 700;"
+                                        id="pre-workout-protein">0</div>
+                                    <div style="color: #a9a9a9; font-size: 12px;">Protein (g)</div>
+                                </div>
+                                <div class="col-3">
+                                    <div style="color: #ffffff; font-size: 20px; font-weight: 700;"
+                                        id="pre-workout-carbs">0</div>
+                                    <div style="color: #a9a9a9; font-size: 12px;">Carbs (g)</div>
+                                </div>
+                                <div class="col-3">
+                                    <div style="color: #ffffff; font-size: 20px; font-weight: 700;"
+                                        id="pre-workout-fats">0</div>
+                                    <div style="color: #a9a9a9; font-size: 12px;">Fats (g)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Post-Workout -->
+                <div class="col-lg-6 mb-4">
+                    <div class="meal-card cs-item p-4" style="background: #151515;">
+                        <h4 style="color: #f20707; margin-bottom: 15px;">💪 Post-Workout</h4>
+                        <h5 id="post-workout-name" style="color: #ffffff; margin-bottom: 10px;"></h5>
+                        <p id="post-workout-desc" style="color: #a9a9a9; margin-bottom: 15px; font-size: 14px;"></p>
+                        <div class="nutrition-info" style="background: #0a0a0a; padding: 15px; border-radius: 4px;">
+                            <div class="row text-center">
+                                <div class="col-3">
+                                    <div style="color: #f20707; font-size: 20px; font-weight: 700;"
+                                        id="post-workout-cal">0</div>
+                                    <div style="color: #a9a9a9; font-size: 12px;">Calories</div>
+                                </div>
+                                <div class="col-3">
+                                    <div style="color: #ffffff; font-size: 20px; font-weight: 700;"
+                                        id="post-workout-protein">0</div>
+                                    <div style="color: #a9a9a9; font-size: 12px;">Protein (g)</div>
+                                </div>
+                                <div class="col-3">
+                                    <div style="color: #ffffff; font-size: 20px; font-weight: 700;"
+                                        id="post-workout-carbs">0</div>
+                                    <div style="color: #a9a9a9; font-size: 12px;">Carbs (g)</div>
+                                </div>
+                                <div class="col-3">
+                                    <div style="color: #ffffff; font-size: 20px; font-weight: 700;"
+                                        id="post-workout-fats">0</div>
+                                    <div style="color: #a9a9a9; font-size: 12px;">Fats (g)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Breakfast -->
+                <div class="col-lg-4 mb-4">
+                    <div class="meal-card cs-item p-4" style="background: #151515;">
+                        <h4 style="color: #f20707; margin-bottom: 15px;">🍳 Breakfast</h4>
+                        <h5 id="breakfast-name" style="color: #ffffff; margin-bottom: 10px;"></h5>
+                        <p id="breakfast-desc" style="color: #a9a9a9; margin-bottom: 15px; font-size: 14px;"></p>
+                        <div class="nutrition-info" style="background: #0a0a0a; padding: 15px; border-radius: 4px;">
+                            <div class="row text-center">
+                                <div class="col-6 mb-2">
+                                    <div style="color: #f20707; font-size: 18px; font-weight: 700;" id="breakfast-cal">0
+                                    </div>
+                                    <div style="color: #a9a9a9; font-size: 11px;">Cal</div>
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <div style="color: #ffffff; font-size: 18px; font-weight: 700;"
+                                        id="breakfast-protein">0</div>
+                                    <div style="color: #a9a9a9; font-size: 11px;">Protein</div>
+                                </div>
+                                <div class="col-6">
+                                    <div style="color: #ffffff; font-size: 18px; font-weight: 700;"
+                                        id="breakfast-carbs">0</div>
+                                    <div style="color: #a9a9a9; font-size: 11px;">Carbs</div>
+                                </div>
+                                <div class="col-6">
+                                    <div style="color: #ffffff; font-size: 18px; font-weight: 700;" id="breakfast-fats">
+                                        0</div>
+                                    <div style="color: #a9a9a9; font-size: 11px;">Fats</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lunch -->
+                <div class="col-lg-4 mb-4">
+                    <div class="meal-card cs-item p-4" style="background: #151515;">
+                        <h4 style="color: #f20707; margin-bottom: 15px;">🍽️ Lunch</h4>
+                        <h5 id="lunch-name" style="color: #ffffff; margin-bottom: 10px;"></h5>
+                        <p id="lunch-desc" style="color: #a9a9a9; margin-bottom: 15px; font-size: 14px;"></p>
+                        <div class="nutrition-info" style="background: #0a0a0a; padding: 15px; border-radius: 4px;">
+                            <div class="row text-center">
+                                <div class="col-6 mb-2">
+                                    <div style="color: #f20707; font-size: 18px; font-weight: 700;" id="lunch-cal">0
+                                    </div>
+                                    <div style="color: #a9a9a9; font-size: 11px;">Cal</div>
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <div style="color: #ffffff; font-size: 18px; font-weight: 700;" id="lunch-protein">0
+                                    </div>
+                                    <div style="color: #a9a9a9; font-size: 11px;">Protein</div>
+                                </div>
+                                <div class="col-6">
+                                    <div style="color: #ffffff; font-size: 18px; font-weight: 700;" id="lunch-carbs">0
+                                    </div>
+                                    <div style="color: #a9a9a9; font-size: 11px;">Carbs</div>
+                                </div>
+                                <div class="col-6">
+                                    <div style="color: #ffffff; font-size: 18px; font-weight: 700;" id="lunch-fats">0
+                                    </div>
+                                    <div style="color: #a9a9a9; font-size: 11px;">Fats</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dinner -->
+                <div class="col-lg-4 mb-4">
+                    <div class="meal-card cs-item p-4" style="background: #151515;">
+                        <h4 style="color: #f20707; margin-bottom: 15px;">🌙 Dinner</h4>
+                        <h5 id="dinner-name" style="color: #ffffff; margin-bottom: 10px;"></h5>
+                        <p id="dinner-desc" style="color: #a9a9a9; margin-bottom: 15px; font-size: 14px;"></p>
+                        <div class="nutrition-info" style="background: #0a0a0a; padding: 15px; border-radius: 4px;">
+                            <div class="row text-center">
+                                <div class="col-6 mb-2">
+                                    <div style="color: #f20707; font-size: 18px; font-weight: 700;" id="dinner-cal">0
+                                    </div>
+                                    <div style="color: #a9a9a9; font-size: 11px;">Cal</div>
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <div style="color: #ffffff; font-size: 18px; font-weight: 700;" id="dinner-protein">
+                                        0</div>
+                                    <div style="color: #a9a9a9; font-size: 11px;">Protein</div>
+                                </div>
+                                <div class="col-6">
+                                    <div style="color: #ffffff; font-size: 18px; font-weight: 700;" id="dinner-carbs">0
+                                    </div>
+                                    <div style="color: #a9a9a9; font-size: 11px;">Carbs</div>
+                                </div>
+                                <div class="col-6">
+                                    <div style="color: #ffffff; font-size: 18px; font-weight: 700;" id="dinner-fats">0
+                                    </div>
+                                    <div style="color: #a9a9a9; font-size: 11px;">Fats</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Summary -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="cs-item p-4 text-center" style="background: #0a0a0a;">
+                        <h4 style="color: #ffffff; margin-bottom: 20px;">📊 Daily Totals</h4>
+                        <div class="row">
+                            <div class="col-md-3 col-6 mb-3">
+                                <div style="color: #f20707; font-size: 32px; font-weight: 700; font-family: 'Oswald', sans-serif;"
+                                    id="total-calories">0</div>
+                                <div
+                                    style="color: #a9a9a9; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                                    Total Calories</div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <div style="color: #ffffff; font-size: 32px; font-weight: 700; font-family: 'Oswald', sans-serif;"
+                                    id="total-protein">0</div>
+                                <div
+                                    style="color: #a9a9a9; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                                    Protein (g)</div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <div style="color: #ffffff; font-size: 32px; font-weight: 700; font-family: 'Oswald', sans-serif;"
+                                    id="total-carbs">0</div>
+                                <div
+                                    style="color: #a9a9a9; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                                    Carbs (g)</div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <div style="color: #ffffff; font-size: 32px; font-weight: 700; font-family: 'Oswald', sans-serif;"
+                                    id="total-fats">0</div>
+                                <div
+                                    style="color: #a9a9a9; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                                    Fats (g)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+<!-- Diet Section End -->
+
+<style>
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .goal-card:hover .cs-item {
+        background: #1a1a1a !important;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(242, 7, 7, 0.3);
+    }
+
+    .meal-card {
+        transition: transform 0.3s ease;
+    }
+
+    .meal-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+
+<script>
+    let currentGoal = null;
+
+    function selectGoal(goal) {
+        currentGoal = goal;
+        document.getElementById('goal-selection').style.display = 'none';
+        document.getElementById('loading-state').style.display = 'block';
+
+        // Generate meal plan
+        fetch('/generate_meal_plan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ goal: goal })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    document.getElementById('loading-state').style.display = 'none';
+                    document.getElementById('goal-selection').style.display = 'flex';
+                } else {
+                    displayMealPlan(data, goal);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to generate meal plan. Please try again.');
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('goal-selection').style.display = 'flex';
+            });
+    }
+
+    function displayMealPlan(plan, goal) {
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('meal-plan-container').style.display = 'block';
+
+        // Set title
+        document.getElementById('plan-title').textContent =
+            goal === 'bulking' ? '💪 Your Bulking Meal Plan' : '🔥 Your Cutting Meal Plan';
+
+        // Display each meal
+        const meals = ['pre_workout', 'post_workout', 'breakfast', 'lunch', 'dinner'];
+        let totalCal = 0, totalProtein = 0, totalCarbs = 0, totalFats = 0;
+
+        meals.forEach(meal => {
+            const mealData = plan[meal];
+            const mealKey = meal.replace('_', '-');
+
+            document.getElementById(`${mealKey}-name`).textContent = mealData.name;
+            document.getElementById(`${mealKey}-desc`).textContent = mealData.description;
+            document.getElementById(`${mealKey}-cal`).textContent = mealData.calories;
+            document.getElementById(`${mealKey}-protein`).textContent = mealData.protein;
+            document.getElementById(`${mealKey}-carbs`).textContent = mealData.carbs;
+            document.getElementById(`${mealKey}-fats`).textContent = mealData.fats;
+
+            totalCal += mealData.calories;
+            totalProtein += mealData.protein;
+            totalCarbs += mealData.carbs;
+            totalFats += mealData.fats;
+        });
+
+        // Display totals
+        document.getElementById('total-calories').textContent = totalCal;
+        document.getElementById('total-protein').textContent = totalProtein;
+        document.getElementById('total-carbs').textContent = totalCarbs;
+        document.getElementById('total-fats').textContent = totalFats;
+
+        // Scroll to meal plan
+        document.getElementById('meal-plan-container').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function regeneratePlan() {
+        if (confirm('Generate a new meal plan? This will replace your current plan.')) {
+            document.getElementById('meal-plan-container').style.display = 'none';
+            document.getElementById('goal-selection').style.display = 'flex';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+</script>
+
+{% endblock %}
