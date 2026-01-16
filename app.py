@@ -15,7 +15,7 @@ import subprocess
 import json
 import re
 from bson.objectid import ObjectId
-import google.generativeai as genai
+from google import genai
 
 # Load environment variables from .env file
 load_dotenv()
@@ -37,11 +37,9 @@ users = mongo.db.users
 # Configure Gemini AI
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 if gemini_api_key:
-    genai.configure(api_key=gemini_api_key)
-    # Use models/gemini-2.5-flash which is confirmed to work with this API key
-    model = genai.GenerativeModel('models/gemini-2.5-flash')
+    client = genai.Client(api_key=gemini_api_key)
 else:
-    model = None
+    client = None
     print("Warning: GEMINI_API_KEY not found in environment variables")
 
 
@@ -569,7 +567,7 @@ def generate_meal_plan():
     if 'user_id' not in session:
         return jsonify({'error': 'Not logged in'}), 401
     
-    if not model:
+    if not client:
         return jsonify({'error': 'Gemini API not configured'}), 500
     
     data = request.get_json()
@@ -638,7 +636,10 @@ Make it realistic, healthy, and achievable. Use common foods available in India.
 """
     
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model='gemini-2.0-flash-exp',
+            contents=prompt
+        )
         meal_plan_text = response.text
         
         # Extract JSON from response
