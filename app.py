@@ -175,7 +175,7 @@ def delete_exercise():
 def workout_history():
     if 'user_id' not in session:
         flash('Please login to view your workout history.', 'warning')
-        return redirect(url_for('index1'))
+        return redirect(url_for('index'))
     user = users.find_one({"_id": ObjectId(session['user_id'])})
     return render_template('workout_history.html', user=user or {})
 
@@ -201,8 +201,8 @@ def login():
             return redirect(url_for('workout_history'))
         else:
             flash('Invalid email or password', 'danger')
-            return redirect(url_for('index1'))
-    return redirect(url_for('index1'))
+            return redirect(url_for('index'))
+    return redirect(url_for('index'))
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -640,7 +640,13 @@ Make it realistic, healthy, and achievable. Use common foods available in India.
             model='gemini-2.0-flash-exp',
             contents=prompt
         )
-        meal_plan_text = response.text
+        # Handle response structure from new API
+        if hasattr(response, 'text'):
+            meal_plan_text = response.text
+        elif hasattr(response, 'candidates') and len(response.candidates) > 0:
+            meal_plan_text = response.candidates[0].content.parts[0].text
+        else:
+            return jsonify({'error': 'Unexpected API response format'}), 500
         
         # Extract JSON from response
         json_match = re.search(r'\{.*\}', meal_plan_text, re.DOTALL)
