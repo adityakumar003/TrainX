@@ -1,0 +1,15 @@
+# Production Dependencies for GymLife Web App
+# Lightweight version without desktop-only dependencies
+
+# Flask Web Application
+Flask==2.3.3
+Werkzeug==2.3.7
+flask_pymongo
+flask_bcrypt
+flask_cors
+pymongo
+dnspython
+python-dotenv
+
+# Production WSGI Server
+gunicorn==21.2.0

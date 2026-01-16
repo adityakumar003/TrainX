@@ -1,0 +1,177 @@
+/* CheckFit Web - GymLife Theme Integration */
+
+/* Video Container */
+.video-container-wrapper {
+    position: relative;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+#webcam {
+    display: none;
+}
+
+#output-canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 600px;
+    min-height: 400px;
+    background: #000;
+    object-fit: contain;
+}
+
+/* Score Bar Colors */
+.score-bar.good {
+    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+}
+
+.score-bar.poor {
+    background: linear-gradient(90deg, #f20707, #ff4444);
+}
+
+/* Pose Selection Buttons */
+.pose-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pose-btn {
+    padding: 15px 20px;
+    border: 2px solid #252525;
+    background: #0a0a0a;
+    color: #ffffff;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+.pose-btn:hover {
+    background: #252525;
+    border-color: #f20707;
+    transform: translateX(5px);
+}
+
+.pose-btn.active {
+    background: #f20707;
+    color: #ffffff;
+    border-color: #f20707;
+}
+
+.pose-btn:active {
+    transform: translateX(3px);
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 4px;
+    color: white;
+    font-weight: 600;
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    z-index: 10000;
+    font-size: 14px;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification.success {
+    background: #4CAF50;
+}
+
+.notification.info {
+    background: #f20707;
+}
+
+.notification.warning {
+    background: #ff9800;
+}
+
+/* Responsive Design */
+@media (max-width: 991px) {
+    .video-container-wrapper {
+        margin-bottom: 30px;
+    }
+
+    #output-canvas {
+        min-height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    #output-canvas {
+        min-height: 300px;
+    }
+
+    .score-value {
+        font-size: 3rem !important;
+    }
+
+    .pose-btn {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+}
+
+/* Loading State */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #ffffff;
+}
+
+.loading-spinner {
+    border: 4px solid rgba(242, 7, 7, 0.3);
+    border-top: 4px solid #f20707;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Instruction Items */
+.instruction-item {
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+.instruction-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Primary Button Override for CheckFit */
+.primary-btn.w-100 {
+    width: 100%;
+    text-align: center;
+    display: block;
+}

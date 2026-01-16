@@ -1,0 +1,170 @@
+{% extends "base1.html" %}
+
+{% block title %}AI CheckFit - Pose Detection | GymLife{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-section set-bg" data-setbg="{{ url_for('static', filename='img/breadcrumb-bg.jpg') }}">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="breadcrumb-text">
+                    <h2>AI CheckFit</h2>
+                    <div class="bt-option">
+                        <a href="{{ url_for('workout_history') }}">Dashboard</a>
+                        <span>Pose Detection</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
+
+<!-- CheckFit Section Begin -->
+<section class="choseus-section spad">
+    <div class="container-fluid">
+        <div class="section-title text-center mb-5">
+            <span>Real-Time AI Analysis</span>
+            <h2>Bodybuilding Pose Detection</h2>
+        </div>
+
+        <div class="row">
+            <!-- Video Feed -->
+            <div class="col-lg-8 mb-4">
+                <div class="video-container-wrapper">
+                    <video id="webcam" autoplay playsinline style="display: none;"></video>
+                    <canvas id="output-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Sidebar Controls -->
+            <div class="col-lg-4">
+                <!-- Score Card -->
+                <div class="cs-item p-4 mb-4" style="background: #151515;">
+                    <div class="current-pose-display text-center mb-3">
+                        <span
+                            style="color: #f20707; font-size: 14px; text-transform: uppercase; font-weight: 700;">Current
+                            Pose</span>
+                        <h4 id="current-pose" style="color: #ffffff; margin-top: 8px;">Front Double Biceps</h4>
+                    </div>
+
+                    <div class="score-display text-center my-4">
+                        <div class="score-value" id="score-value"
+                            style="font-size: 4rem; font-weight: 700; color: #f20707; font-family: 'Oswald', sans-serif;">
+                            0</div>
+                        <div class="score-label"
+                            style="color: #a9a9a9; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                            Score</div>
+                    </div>
+
+                    <div class="score-bar-container"
+                        style="width: 100%; height: 8px; background: #0a0a0a; border-radius: 4px; overflow: hidden; margin: 20px 0;">
+                        <div class="score-bar" id="score-bar"
+                            style="width: 0%; height: 100%; transition: width 0.3s ease, background-color 0.3s ease;">
+                        </div>
+                    </div>
+
+                    <!-- Hold Timer -->
+                    <div id="hold-timer-container" class="text-center mb-3" style="display: none;">
+                        <div
+                            style="background: #4CAF50; color: #fff; padding: 10px; border-radius: 4px; font-family: 'Oswald', sans-serif;">
+                            <span style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Holding:
+                            </span>
+                            <span id="hold-timer" style="font-size: 24px; font-weight: 700;">0s</span>
+                        </div>
+                    </div>
+
+                    <div class="feedback-box text-center p-3" style="background: #0a0a0a; border-radius: 8px;">
+                        <p id="feedback-text" style="color: #ffffff; margin: 0; font-size: 14px;">Position yourself in
+                            frame</p>
+                    </div>
+                </div>
+
+                <!-- Pose Selection -->
+                <div class="cs-item p-4 mb-4" style="background: #151515;">
+                    <h4 style="color: #ffffff; margin-bottom: 20px; font-size: 20px;">💪 Select Pose</h4>
+                    <div class="pose-buttons">
+                        <button class="pose-btn active" onclick="switchPose('Front Double Biceps')">
+                            🔥 Front Double Biceps
+                        </button>
+                        <button class="pose-btn" onclick="switchPose('Back Double Biceps')">
+                            💪 Back Double Biceps
+                        </button>
+                        <button class="pose-btn" onclick="switchPose('Side Chest')">
+                            🦾 Side Chest
+                        </button>
+                        <button class="pose-btn" onclick="switchPose('Lat Flex')">
+                            🏋️ Lat Flex
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="cs-item p-4" style="background: #151515;">
+                    <h4 style="color: #ffffff; margin-bottom: 20px; font-size: 20px;">📸 Controls</h4>
+                    <button class="primary-btn btn-normal w-100 mb-3" onclick="captureManualScreenshot()">
+                        📷 Take Screenshot
+                    </button>
+                    <a href="{{ url_for('workout_history') }}" class="primary-btn btn-normal w-100 d-block text-center"
+                        style="background: #252525;">
+                        🏠 Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="row mt-5">
+            <div class="col-lg-12">
+                <div class="cs-item p-4" style="background: #151515;">
+                    <h4 style="color: #ffffff; margin-bottom: 20px; font-size: 22px; text-align: center;">📖 How to Use
+                    </h4>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="instruction-item text-center">
+                                <span
+                                    style="display: inline-block; width: 50px; height: 50px; background: #f20707; border-radius: 50%; line-height: 50px; color: #fff; font-size: 24px; margin-bottom: 15px;">1</span>
+                                <p style="color: #a9a9a9; margin: 0;"><strong style="color: #fff;">Allow camera
+                                        access</strong> when prompted by your browser</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="instruction-item text-center">
+                                <span
+                                    style="display: inline-block; width: 50px; height: 50px; background: #f20707; border-radius: 50%; line-height: 50px; color: #fff; font-size: 24px; margin-bottom: 15px;">2</span>
+                                <p style="color: #a9a9a9; margin: 0;"><strong style="color: #fff;">Select a
+                                        pose</strong> and perform it in front of the camera</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="instruction-item text-center">
+                                <span
+                                    style="display: inline-block; width: 50px; height: 50px; background: #f20707; border-radius: 50%; line-height: 50px; color: #fff; font-size: 24px; margin-bottom: 15px;">3</span>
+                                <p style="color: #a9a9a9; margin: 0;"><strong style="color: #fff;">Hold score
+                                        ≥80</strong> for 3 seconds to auto-capture your pose</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- CheckFit Section End -->
+
+<!-- Notification -->
+<div id="notification" class="notification"></div>
+
+<!-- MediaPipe Pose -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+<!-- Our scripts -->
+<script src="{{ url_for('static', filename='js/pose_scoring.js') }}"></script>
+<script src="{{ url_for('static', filename='js/pose_detection.js') }}"></script>
+
+{% endblock %}

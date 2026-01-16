@@ -22,7 +22,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Secret key for session management
-app.secret_key = "supersecretkey"
+app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
 
 # MongoDB Configuration (single source of truth)
 app.config["MONGO_URI"] = os.getenv("MONGODB_URI")
@@ -507,6 +507,15 @@ def triceps():
 
 @app.route('/checkfit')
 def checkfit():
+    """Web-based pose detection - runs in browser"""
+    if 'user_id' not in session:
+        flash('Please login to use AI CheckFit.', 'warning')
+        return redirect(url_for('index'))
+    return render_template('checkfit_web.html')
+
+@app.route('/checkfit-desktop')
+def checkfit_desktop():
+    """Legacy desktop-based pose detection (for local use only)"""
     try:
         # Path to the pose detection script
         script_path = os.path.join(app.root_path, 'pose_detection1', 'app1.py')
@@ -529,5 +538,9 @@ def checkfit():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=8000)
+    # Get port from environment variable (for deployment) or use 8000 for local
+    port = int(os.getenv('PORT', 8000))
+    # Use debug mode only in development
+    debug_mode = os.getenv('FLASK_ENV', 'development') == 'development'
+    app.run(debug=debug_mode, host='0.0.0.0', port=port)
 
