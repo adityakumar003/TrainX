@@ -3,7 +3,7 @@ from flask_pymongo import PyMongo
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, date
 from dotenv import load_dotenv
 import os
 import csv
@@ -42,9 +42,23 @@ else:
     client = None
     print("Warning: GEMINI_API_KEY not found in environment variables")
 
+# ── BMI Range Helper ────────────────────────────────────────────────────────
+MEAL_PLAN_CACHE_DAYS = 60  # Re-generate plan if same BMI range held for this long
+
+def get_bmi_range(bmi: float) -> str:
+    """Return a stable string key for the user's BMI category."""
+    if bmi < 18.5:
+        return "underweight"
+    elif bmi <= 24.9:
+        return "healthy"
+    elif bmi <= 29.9:
+        return "overweight"
+    else:
+        return "obese"
 
 
 @app.route('/add_workout', methods=['POST'])
+
 def add_workout():
     if 'user_id' not in session:
         return jsonify({'error': 'Not logged in'}), 401
@@ -261,16 +275,41 @@ def calculate_bmi():
     else:
         status = "Obese"
 
-    # Update user in DB
-    users.update_one(
-        {"_id": ObjectId(session['user_id'])},
-        {"$set": {"bmi": bmi, "bmi_status": status, "height": height, "weight": weight, "age": age, "sex": sex}}
-    )
-    
+    new_range = get_bmi_range(bmi)
+
+    # Fetch old BMI range to detect boundary crossings
+    existing_user = users.find_one({"_id": ObjectId(session['user_id'])}, {"bmi_range": 1})
+    old_range = existing_user.get("bmi_range") if existing_user else None
+
+    update_fields = {
+        "bmi": bmi,
+        "bmi_status": status,
+        "bmi_range": new_range,
+        "height": height,
+        "weight": weight,
+        "age": age,
+        "sex": sex
+    }
+
+    update_op = {"$set": update_fields}
+
+    # If BMI crossed into a new range, wipe all cached meal plans for every old range
+    if old_range and old_range != new_range:
+        unset_fields = {}
+        for goal in ["bulking", "cutting"]:
+            for rng in ["underweight", "healthy", "overweight", "obese"]:
+                unset_fields[f"meal_plan_{goal}_{rng}"] = ""
+                unset_fields[f"meal_plan_{goal}_{rng}_generated_at"] = ""
+        update_op["$unset"] = unset_fields
+
+    users.update_one({"_id": ObjectId(session['user_id'])}, update_op)
+
     # Update session
     session['user_bmi'] = bmi
-    
-    return jsonify({'bmi': bmi, 'status': status})
+    session['user_bmi_range'] = new_range
+
+    range_changed = (old_range is not None and old_range != new_range)
+    return jsonify({'bmi': bmi, 'status': status, 'range_changed': range_changed})
 
 SECTIONS = ["Legs", "Back", "Chest", "Biceps", "Triceps", "Shoulders", "Core"]
 
@@ -575,97 +614,215 @@ def generate_meal_plan():
     
     if goal not in ['bulking', 'cutting']:
         return jsonify({'error': 'Invalid goal. Must be bulking or cutting'}), 400
+
+    # ── Health Guard: block medically unsafe goal/BMI combinations ───────────
+    pre_check_user = users.find_one({"_id": ObjectId(session['user_id'])}, {"bmi": 1, "bmi_range": 1})
+    pre_bmi        = pre_check_user.get('bmi', 22) if pre_check_user else 22
+    pre_bmi_range  = pre_check_user.get('bmi_range') or get_bmi_range(pre_bmi)
+
+    if pre_bmi_range == 'underweight' and goal == 'cutting':
+        return jsonify({'error': 'Cutting is not recommended for underweight individuals. Please choose Bulking to reach a healthy weight first.'}), 400
+    if pre_bmi_range == 'obese' and goal == 'bulking':
+        return jsonify({'error': 'Bulking is not recommended for obese individuals. Please choose Cutting to reach a healthier weight first.'}), 400
     
     user = users.find_one({"_id": ObjectId(session['user_id'])})
-    
-    # Get user data
-    bmi = user.get('bmi', 22)
+
+    # ── User stats ────────────────────────────────────────────────────────────
+    bmi    = user.get('bmi', 22)
     weight = user.get('weight', 70)
     height = user.get('height', 170)
-    age = user.get('age', 25)
-    sex = user.get('sex', 'male')
-    
-    # Check if we already generated a plan today
-    today = datetime.now().strftime("%Y-%m-%d")
-    cached_plan_date = user.get(f'meal_plan_{goal}_date')
-    
-    if cached_plan_date == today:
-        # Return cached plan
-        cached_plan = user.get(f'meal_plan_{goal}')
-        if cached_plan:
-            return jsonify(cached_plan)
-    
-    # Generate new meal plan
-    prompt = f"""Create a detailed {goal} meal plan for a {sex} with:
-- BMI: {bmi}
-- Weight: {weight} kg
-- Height: {height} cm
-- Age: {age} years
+    age    = user.get('age', 25)
+    sex    = user.get('sex', 'male')
+    bmi_range = user.get('bmi_range') or get_bmi_range(bmi)
 
-Provide 5 meals with realistic portions and nutritional information:
-1. Pre-workout meal (light, energizing)
-2. Post-workout meal (protein-rich for recovery)
-3. Breakfast (balanced, nutritious)
-4. Lunch (main meal, substantial)
-5. Dinner (lighter than lunch)
+    # ── Cache key is goal + BMI range (e.g. "meal_plan_cutting_overweight") ──
+    cache_key      = f"meal_plan_{goal}_{bmi_range}"
+    cache_date_key = f"{cache_key}_generated_at"
 
-For each meal, provide:
-- name: A descriptive meal name
-- calories: Total calories (number)
-- protein: Protein in grams (number)
-- carbs: Carbohydrates in grams (number)
-- fats: Fats in grams (number)
-- description: Brief description of the meal and ingredients
+    cached_plan      = user.get(cache_key)
+    cached_generated = user.get(cache_date_key)   # stored as "YYYY-MM-DD" string
 
-Format your response as valid JSON with this exact structure:
+    # Determine if the cached plan is still fresh (within MEAL_PLAN_CACHE_DAYS)
+    cache_is_fresh = False
+    days_in_range  = 0
+    if cached_plan and cached_generated:
+        try:
+            gen_date      = datetime.strptime(cached_generated, "%Y-%m-%d").date()
+            days_in_range = (date.today() - gen_date).days
+            cache_is_fresh = days_in_range < MEAL_PLAN_CACHE_DAYS
+        except ValueError:
+            pass
+
+    if cache_is_fresh:
+        return jsonify(cached_plan)
+
+    # ── Progressive mode: same range held for 60+ days ───────────────────────
+    progressive = (cached_plan is not None and days_in_range >= MEAL_PLAN_CACHE_DAYS)
+
+    # ── Build Gemini prompt ───────────────────────────────────────────────────
+    bmi_label_map = {
+        "underweight": "Underweight (BMI < 18.5)",
+        "healthy":     "Healthy (BMI 18.5–24.9)",
+        "overweight":  "Overweight (BMI 25.0–29.9)",
+        "obese":       "Obese (BMI ≥ 30.0)",
+    }
+    bmi_label = bmi_label_map.get(bmi_range, f"BMI {bmi}")
+
+    if progressive:
+        intensity_note = (
+            f"IMPORTANT: The user has been following a {goal} diet for {days_in_range} days "
+            f"but their BMI category ({bmi_label}) has NOT changed yet. "
+            f"This is a PROGRESSIVE refresh — increase the dietary intensity to accelerate "
+            f"progress toward their {goal} goal. "
+            + ("Increase the calorie surplus by 10-15%, boost protein and complex carbs "
+               "to drive more muscle gain." if goal == "bulking" else
+               "Tighten the calorie deficit by 10-15%, increase protein further to protect "
+               "muscle, reduce refined carbs and fats more aggressively.")
+        )
+    else:
+        intensity_note = (
+            f"The user is in the {bmi_label} category. "
+            f"Tailor the plan specifically for someone starting their {goal} journey at this BMI."
+        )
+
+    # ── BMI-range-specific calorie & protein targets ──────────────────────────
+    if bmi_range == "underweight":
+        # Bulk only (cutting blocked upstream)
+        protein_lo, protein_hi = 130, 160
+        calorie_note = "Maintenance + 300–500 kcal surplus (hard bulk to build mass)"
+        carb_note    = "High complex carbs (rice, oats, banana, roti, sweet potato) for calorie surplus"
+        fat_note     = "Healthy fats (peanut butter, ghee, nuts) — 25-35% of calories"
+        goal_label   = "Bulking"
+
+    elif bmi_range == "healthy":
+        if goal == "bulking":
+            protein_lo, protein_hi = 130, 180
+            calorie_note = "Maintenance + 250–400 kcal surplus (moderate lean bulk)"
+            carb_note    = "Moderate-to-high complex carbs for energy and muscle growth"
+            fat_note     = "Healthy fats — 20-30% of calories"
+            goal_label   = "Bulking"
+        else:
+            protein_lo, protein_hi = 120, 160
+            calorie_note = "Maintenance − 300–500 kcal deficit (steady fat loss)"
+            carb_note    = "Moderate complex carbs (oats, brown rice, roti) — no refined sugar"
+            fat_note     = "Lower fats but keep essential fats from nuts and seeds"
+            goal_label   = "Cutting"
+
+    elif bmi_range == "overweight":
+        if goal == "bulking":
+            protein_lo, protein_hi = 120, 150
+            calorie_note = "Maintenance + 100–200 kcal only (lean bulk — minimal fat gain)"
+            carb_note    = "Lower carbs than standard bulk — complex carbs only (oats, brown rice)"
+            fat_note     = "Minimal added fats; rely on natural sources (nuts, curd)"
+            goal_label   = "Lean Bulk"
+        else:
+            protein_lo, protein_hi = 140, 190
+            calorie_note = "Maintenance − 400–600 kcal deficit (aggressive fat loss)"
+            carb_note    = "Moderate complex carbs only — strictly avoid refined carbs and sugar"
+            fat_note     = "Low fats; include only essential fats from nuts and seeds"
+            goal_label   = "Cutting"
+
+    else:  # obese — cut only (bulk blocked upstream)
+        protein_lo, protein_hi = 150, 220
+        calorie_note = "Maintenance − 500–800 kcal deficit (aggressive cut to reduce health risk)"
+        carb_note    = "Low carbs — only high-fibre complex carbs (vegetables, oats, 1 small roti)"
+        fat_note     = "Very low added fats; only essential omega-3 fats"
+        goal_label   = "Cutting"
+
+    protein_g   = (protein_lo + protein_hi) // 2   # midpoint for prompt enforcement
+    veg_protein_min = protein_lo                    # veg plan must hit at least lower bound
+
+    goal_guidelines = (
+        f"- Daily protein target: {protein_lo}–{protein_hi} g (fixed range for {bmi_label} + {goal_label})\n"
+        f"- Calorie adjustment: {calorie_note}\n"
+        f"- Carbs: {carb_note}\n"
+        f"- Fats: {fat_note}\n"
+        "- CRITICAL: Use real Indian household portions — NOT bodybuilder quantities"
+    )
+
+    prompt = f"""Create a REALISTIC {goal_label} meal plan for a {sex} with:
+- BMI: {bmi} ({bmi_label})
+- Weight: {weight} kg | Height: {height} cm | Age: {age} years
+- Daily protein target: {protein_lo}–{protein_hi} g (MUST stay within this range)
+
+{intensity_note}
+
+STRICT RULES:
+- Total protein across all 5 meals MUST be between {protein_lo} g and {protein_hi} g — no exceptions
+- Total calorie adjustment: {calorie_note}
+- Use real Indian home-cooked portions (e.g. "2 medium rotis", "1 cup dal", "100g paneer")
+- Preferred foods: dal, rajma, chana, paneer, eggs, chicken breast, curd, oats, poha, idli, brown rice, roti, sprouts, banana, peanut butter
+- NO protein powder or supplements in the main plan
+
+Provide exactly 5 meals:
+1. Pre-workout (light, 150–300 kcal)
+2. Post-workout (protein-focused, 300–450 kcal)
+3. Breakfast (balanced, 350–500 kcal)
+4. Lunch (main meal, 450–650 kcal)
+5. Dinner (lighter, 300–450 kcal)
+
+For each meal provide:
+- name: Short meal name
+- calories: number only
+- protein: grams, number only
+- carbs: grams, number only
+- fats: grams, number only
+- description: 1-2 sentences with realistic portions and key ingredients
+
+ALSO provide a PURE VEGETARIAN ALTERNATIVE plan (strictly no meat, no eggs, no fish).
+Use: paneer, tofu, curd, dal, rajma, chana, soya chunks, sprouts, nuts, seeds, milk.
+The veg plan must achieve similar total calories and at least {veg_protein_min} g total protein.
+
+Respond with valid JSON using EXACTLY this structure:
 {{
-    "pre_workout": {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
+    "pre_workout":  {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
     "post_workout": {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
-    "breakfast": {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
-    "lunch": {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
-    "dinner": {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}}
+    "breakfast":    {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
+    "lunch":        {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
+    "dinner":       {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
+    "veg_plan": {{
+        "pre_workout":  {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
+        "post_workout": {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
+        "breakfast":    {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
+        "lunch":        {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}},
+        "dinner":       {{"name": "", "calories": 0, "protein": 0, "carbs": 0, "fats": 0, "description": ""}}
+    }}
 }}
 
-Guidelines for {goal}:
-{"- High calorie surplus (300-500 cal above maintenance)" if goal == "bulking" else "- Calorie deficit (300-500 cal below maintenance)"}
-{"- High protein (1.6-2.2g per kg bodyweight)" if goal == "bulking" else "- Very high protein (2.0-2.5g per kg bodyweight) to preserve muscle"}
-{"- Moderate to high carbs for energy and muscle growth" if goal == "bulking" else "- Moderate carbs, focus on complex carbs"}
-{"- Healthy fats for hormone production" if goal == "bulking" else "- Lower fats to create calorie deficit"}
+Guidelines for {goal_label}:
 
-Make it realistic, healthy, and achievable. Use common foods available in India.
+{goal_guidelines}
 """
-    
+
     try:
         response = client.models.generate_content(
-            model='gemini-2.0-flash-exp',
+            model='gemini-2.5-flash',
             contents=prompt
         )
-        # Handle response structure from new API
         if hasattr(response, 'text'):
             meal_plan_text = response.text
         elif hasattr(response, 'candidates') and len(response.candidates) > 0:
             meal_plan_text = response.candidates[0].content.parts[0].text
         else:
             return jsonify({'error': 'Unexpected API response format'}), 500
-        
-        # Extract JSON from response
+
         json_match = re.search(r'\{.*\}', meal_plan_text, re.DOTALL)
         if json_match:
             meal_plan = json.loads(json_match.group())
-            
-            # Save to database
+
+            # Persist under the range-keyed cache fields
             users.update_one(
                 {"_id": ObjectId(session['user_id'])},
                 {"$set": {
-                    f"meal_plan_{goal}": meal_plan,
-                    f"meal_plan_{goal}_date": today
+                    cache_key:      meal_plan,
+                    cache_date_key: date.today().strftime("%Y-%m-%d"),
+                    "bmi_range":    bmi_range,
                 }}
             )
-            
             return jsonify(meal_plan)
         else:
             return jsonify({'error': 'Could not parse meal plan from AI response'}), 500
-    
+
     except Exception as e:
         print(f"Error generating meal plan: {str(e)}")
         return jsonify({'error': f'Failed to generate meal plan: {str(e)}'}), 500
